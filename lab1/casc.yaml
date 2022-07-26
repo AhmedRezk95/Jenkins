@@ -1,0 +1,19 @@
+jenkins:
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        # create a user called admin
+        - id: docke"admin"
+          password: "admin"
+  authorizationStrategy: loggedInUsersCanDoAnything
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - usernamePassword:
+              scope:    SYSTEM
+              id:       docker-hub-user
+              username: rizk
+              password: test

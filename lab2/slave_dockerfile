@@ -1,0 +1,47 @@
+FROM ubuntu
+USER root
+
+################ FIRST CONFIGURE IMAGE TO BE SLAVE #################
+# create a directory to set all jenkins projects
+RUN mkdir -p jenkins_home
+RUN chmod 777 jenkins_home
+# setup the required packages for creating a jenkins slave: 
+# openjdk ,openssh: for allowing ssh 
+RUN apt-get update -qq
+RUN apt-get install openjdk-11-jdk -qq
+RUN apt-get install openssh-server -qq
+# create a user called jenkins
+RUN useradd -ms /bin/bash jenkins
+
+################ SETUP DOCKER CLIENT INSIDE  SLAVE #################
+# Install docker client
+RUN apt-get update -qq
+# Install dependencies
+RUN apt-get install -qq apt-transport-https ca-certificates curl gnupg2 software-properties-common
+# Add Docker’s GPG Key (remember it is ubuntu based ) / don't set it as sudo !
+RUN curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
+# Install the Docker Repository "remember it is ubuntu based)"
+RUN add-apt-repository \
+    "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+    $(lsb_release -cs) \
+    stable"
+# Update Repositories  &  Install Latest Version of Docker
+RUN apt-get update -qq \
+    && apt-get install docker-ce -y
+# Add the user jenkins to the group docker on the system 
+RUN usermod -aG docker jenkins
+
+RUN mkdir -p /home/jenkins/.ssh
+COPY docker_rsa.pub /home/jenkins/.ssh/authorized_keys
+RUN chown -R jenkins:jenkins /home/jenkins/.ssh
+RUN chmod 700 /home/jenkins/.ssh
+RUN chmod 644 /home/jenkins/.ssh/authorized_keys
+
+# log-in as jenkins user
+USER jenkins
+# cd jenkins_home
+WORKDIR /home/jenkins/jenkins_home
+
+EXPOSE 22
+# run it 
+CMD ["/bin/bash"]
