@@ -1,4 +1,3 @@
-# Jenkins-LAB2-ANSWERS
 ## Q1: configure Jenkins image to run docker commands on your host docker daemon
 
 - what we want to install docker inside Jenkins, we will install docker client and then we will make our Jenkins container user our local ”my pc” docker demon via docker volume
